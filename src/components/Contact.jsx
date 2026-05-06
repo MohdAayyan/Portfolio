@@ -1,5 +1,8 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import emailjs from '@emailjs/browser';
+import { Mail, Phone, MapPin, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 
 // Initialize EmailJS
 emailjs.init('orbUQVLfGPBnE86h9');
@@ -11,33 +14,24 @@ export default function Contact() {
     phone: '',
     message: '',
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState('idle'); // idle, loading, success, error
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-    setError('');
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (status === 'error') setStatus('idle');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    setStatus('loading');
     
-    // Validate form
-    if (!formData.name || !formData.email || !formData.phone || !formData.message) {
-      setError('Please fill all fields');
-      setLoading(false);
+    if (!formData.name || !formData.email || !formData.message) {
+      setStatus('error');
       return;
     }
 
     try {
-      // Send email via EmailJS
       await emailjs.send(
         'service_aaztebe',
         'template_ltu098a',
@@ -50,127 +44,149 @@ export default function Contact() {
         }
       );
       
-      // Show success message
-      setSubmitted(true);
-      
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        message: '',
-      });
-
-      // Clear success message after 3 seconds
-      setTimeout(() => setSubmitted(false), 3000);
+      setStatus('success');
+      setFormData({ name: '', email: '', phone: '', message: '' });
+      setTimeout(() => setStatus('idle'), 5000);
     } catch (err) {
       console.error('Failed to send email:', err);
-      setError('Failed to send message. Please try again.');
-    } finally {
-      setLoading(false);
+      setStatus('error');
     }
   };
 
   return (
-    <section id="contact" className="bg-gray-100 text-slate-950 py-24">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="mb-16">
-          <div className="flex items-center gap-3 text-sm uppercase tracking-[0.3em] text-sky-600">
-
-          </div>
-          <h2 className="mt-4 text-5xl font-serif font-semibold tracking-tight">
-            Contact Me
-          </h2>
+    <section id="contact" className="section-padding relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px] -z-10" />
+      
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-16">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-sm font-bold tracking-[0.3em] text-primary uppercase mb-4"
+          >
+            Get In Touch
+          </motion.h2>
+          <motion.h3 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-5xl font-bold"
+          >
+            Let's Start a <span className="text-muted-foreground">Project.</span>
+          </motion.h3>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-16">
-          {/* LEFT SIDE - CONTACT INFO */}
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Phone Number</h3>
-              <p className="text-sky-600 font-medium">+91 7702010454</p>
-            </div>
+        <div className="grid md:grid-cols-5 gap-12">
+          {/* Contact Info */}
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="md:col-span-2 space-y-8"
+          >
+            <div className="glass-card p-8 space-y-8">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-primary/10 rounded-xl text-primary">
+                  <Mail size={24} />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground uppercase font-bold tracking-wider mb-1">Email Me</p>
+                  <a href="mailto:mohdaayyan@gmail.com" className="text-lg font-medium hover:text-primary transition-colors">
+                    mohdaayyan@gmail.com
+                  </a>
+                </div>
+              </div>
 
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Email</h3>
-              <a href="mailto:mohdaayyan@gmail.com" className="text-sky-600 hover:underline font-medium">
-                mohdaayyan@gmail.com
-              </a>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Social Network</h3>
-              <div className="flex gap-4 text-2xl">
-                <a href="#" className="hover:text-sky-600 transition">
-                  <i className="fab fa-facebook" />
-                </a>
-                <a href="#" className="hover:text-sky-600 transition">
-                  <i className="fab fa-twitter" />
-                </a>
-                <a href="#" className="hover:text-sky-600 transition">
-                  <i className="fab fa-instagram" />
-                </a>
-                <a href="#" className="hover:text-sky-600 transition">
-                  <i className="fab fa-dribbble" />
-                </a>
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-accent/10 rounded-xl text-accent">
+                  <Phone size={24} />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground uppercase font-bold tracking-wider mb-1">Call Me</p>
+                  <a href="tel:+917702010454" className="text-lg font-medium hover:text-accent transition-colors">
+                    +91 7702010454
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* RIGHT SIDE - FORM */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {submitted && (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                ✓ Message sent successfully!
+          {/* Form */}
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="md:col-span-3"
+          >
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white/70 ml-1">Your Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 transition-colors"
+                    placeholder="Name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white/70 ml-1">Email Address</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 transition-colors"
+                    placeholder="Email"
+                  />
+                </div>
               </div>
-            )}
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                ✗ {error}
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white/70 ml-1">Subject (Optional)</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 transition-colors"
+                  placeholder="Project Inquiry"
+                />
               </div>
-            )}
-            <input
-              type="text"
-              name="name"
-              placeholder="Your Name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded bg-white focus:outline-none focus:border-sky-600"
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Your E-mail"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded bg-white focus:outline-none focus:border-sky-600"
-            />
-            <input
-              type="tel"
-              name="phone"
-              placeholder="Phone Number"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded bg-white focus:outline-none focus:border-sky-600"
-            />
-            <textarea
-              name="message"
-              placeholder="Your Message"
-              rows="6"
-              value={formData.message}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded bg-white focus:outline-none focus:border-sky-600 resize-none"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-sky-700 text-white font-semibold py-3 rounded hover:bg-sky-800 transition uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Sending...' : 'Send'}
-            </button>
-          </form>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white/70 ml-1">Message</label>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  rows="5"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 transition-colors resize-none"
+                  placeholder="Tell me about your project..."
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={status === 'loading'}
+                className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${
+                  status === 'loading' ? 'bg-primary/50 cursor-wait' : 
+                  status === 'success' ? 'bg-green-500' : 'bg-primary hover:bg-primary/80'
+                }`}
+              >
+                {status === 'loading' ? 'Sending...' : 
+                 status === 'success' ? <><CheckCircle2 size={20} /> Sent Successfully</> : 
+                 status === 'error' ? <><AlertCircle size={20} /> Error Occurred</> :
+                 <><Send size={20} /> Send Message</>}
+              </button>
+            </form>
+          </motion.div>
         </div>
       </div>
     </section>
-  )
+  );
 }
